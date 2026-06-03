@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Calculadora de CORE</title>
+    <style>
+        body {
+            background-color: #1a1a2e;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: #eee;
+        }
+        .cabecera {
+            color: #e0aaff;
+            margin-bottom: 20px;
+        }
+        #calculadora {
+            background-color: #16213e;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            width: 320px;
+        }
+        #pantalla {
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 1.8rem;
+            text-align: right;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            background: #0f3460;
+            color: #fff;
+            margin-bottom: 16px;
+        }
+        .fila {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        button {
+            flex: 1;
+            padding: 14px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background-color: #533483;
+            color: white;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background-color: #7b52ab;
+        }
+        .btn-op {
+            background-color: #e94560;
+        }
+        .btn-op:hover {
+            background-color: #ff6b81;
+        }
+        .btn-igual {
+            background-color: #0f3460;
+        }
+        .btn-igual:hover {
+            background-color: #1a5276;
+        }
+        .btn-clear {
+            background-color: #2d4059;
+        }
+        .btn-clear:hover {
+            background-color: #3d566e;
+        }
+        #info {
+            margin-top: 20px;
+            font-size: 1rem;
+            color: #e0aaff;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<h1 class="cabecera">Calculadora de CORE</h1>
+
+<div id="calculadora">
+    <input type="text" id="pantalla" value="0">
+
+    <div class="fila">
+        <button id="cuadrado">x²</button>
+        <button id="raiz">√</button>
+        <button id="factorial">n!</button>
+    </div>
+
+    <div class="fila">
+        <button id="suma" class="btn-op">+</button>
+        <button id="resta" class="btn-op">-</button>
+        <button id="multiplicacion" class="btn-op">×</button>
+        <button id="division" class="btn-op">÷</button>
+    </div>
+
+    <div class="fila">
+        <button id="igual" class="btn-igual">=</button>
+    </div>
+
+    <div class="fila">
+        <button id="clearScreen" class="btn-clear">C</button>
+        <button id="clearAll" class="btn-clear">AC</button>
+    </div>
+</div>
+
+<h2 id="info" class="grande" title="Info sobre el número">Info sobre el número</h2>
+
+<script>
+    // Variables globales
+    let primerNumero = null;
+    let operador = null;
+    let operacionRealizada = false;
+
+    const pantalla = document.getElementById('pantalla');
+
+    // Función validar
+    const validar = () => {
+        const val = pantalla.value;
+        const num = parseFloat(val);
+        if (val === '' || isNaN(num)) {
+            pantalla.value = 'Error';
+            return false;
+        }
+        return true;
+    };
+
+    // Función rellenar_info
+    const rellenar_info = () => {
+        const val = parseFloat(pantalla.value);
+        const info = document.getElementById('info');
+        if (isNaN(val)) {
+            info.textContent = 'Info sobre el número';
+        } else if (val < 100) {
+            info.textContent = 'Info: El resultado es menor que 100';
+        } else if (val >= 100 && val <= 200) {
+            info.textContent = 'Info: El resultado está entre 100 y 200';
+        } else {
+            info.textContent = 'Info: El resultado es superior a 200';
+        }
+    };
+
+    // Operaciones unitarias
+    const sq = () => {
+        if (!validar()) return;
+        const val = parseFloat(pantalla.value);
+        pantalla.value = val * val;
+        rellenar_info();
+    };
+
+    const sqr = () => {
+        if (!validar()) return;
+        const val = parseFloat(pantalla.value);
+        pantalla.value = Math.sqrt(val);
+        rellenar_info();
+    };
+
+    const fact = () => {
+        if (!validar()) return;
+        const val = parseInt(pantalla.value);
+        if (val < 0 || !Number.isInteger(val)) {
+            pantalla.value = 'Error';
+            return;
+        }
+        let resultado = 1;
+        for (let i = 2; i <= val; i++) {
+            resultado *= i;
+        }
+        pantalla.value = resultado;
+        rellenar_info();
+    };
+
+    // Operaciones binarias
+    const vaciar = () => {
+        pantalla.value = '';
+    };
+
+    const add = () => {
+        if (!validar()) return;
+        primerNumero = parseFloat(pantalla.value);
+        operador = 'suma';
+        operacionRealizada = false;
+        vaciar();
+    };
+
+    const sub = () => {
+        if (!validar()) return;
+        primerNumero = parseFloat(pantalla.value);
+        operador = 'resta';
+        operacionRealizada = false;
+        vaciar();
+    };
+
+    const mul = () => {
+        if (!validar()) return;
+        primerNumero = parseFloat(pantalla.value);
+        operador = 'multiplicacion';
+        operacionRealizada = false;
+        vaciar();
+    };
+
+    const div = () => {
+        if (!validar()) return;
+        primerNumero = parseFloat(pantalla.value);
+        operador = 'division';
+        operacionRealizada = false;
+        vaciar();
+    };
+
+    const eq = () => {
+        if (operacionRealizada || primerNumero === null || operador === null) return;
+        if (!validar()) return;
+        const segundoNumero = parseFloat(pantalla.value);
+        let resultado;
+        switch (operador) {
+            case 'suma': resultado = primerNumero + segundoNumero; break;
+            case 'resta': resultado = primerNumero - segundoNumero; break;
+            case 'multiplicacion': resultado = primerNumero * segundoNumero; break;
+            case 'division':
+                if (segundoNumero === 0) { pantalla.value = 'Error'; return; }
+                resultado = primerNumero / segundoNumero;
+                break;
+        }
+        pantalla.value = resultado;
+        primerNumero = resultado;
+        operacionRealizada = true;
+        rellenar_info();
+    };
+
+    // Limpieza
+    const clearScreen = () => {
+        pantalla.value = '0';
+    };
+
+    const clearAll = () => {
+        pantalla.value = '0';
+        primerNumero = null;
+        operador = null;
+        operacionRealizada = false;
+    };
+
+    // Event listeners
+    document.getElementById('cuadrado').addEventListener('click', sq);
+    document.getElementById('raiz').addEventListener('click', sqr);
+    document.getElementById('factorial').addEventListener('click', fact);
+    document.getElementById('suma').addEventListener('click', add);
+    document.getElementById('resta').addEventListener('click', sub);
+    document.getElementById('multiplicacion').addEventListener('click', mul);
+    document.getElementById('division').addEventListener('click', div);
+    document.getElementById('igual').addEventListener('click', eq);
+    document.getElementById('clearScreen').addEventListener('click', clearScreen);
+    document.getElementById('clearAll').addEventListener('click', clearAll);
+</script>
+
+</body>
+</html>
