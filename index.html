@@ -15,10 +15,7 @@
             font-family: Arial, sans-serif;
             color: #eee;
         }
-        .cabecera {
-            color: #e0aaff;
-            margin-bottom: 20px;
-        }
+        .cabecera { color: #e0aaff; margin-bottom: 20px; }
         #calculadora {
             background-color: #16213e;
             border-radius: 16px;
@@ -38,11 +35,7 @@
             color: #fff;
             margin-bottom: 16px;
         }
-        .fila {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
+        .fila { display: flex; gap: 8px; margin-bottom: 8px; }
         button {
             flex: 1;
             padding: 14px;
@@ -54,33 +47,14 @@
             color: white;
             transition: background 0.2s;
         }
-        button:hover {
-            background-color: #7b52ab;
-        }
-        .btn-op {
-            background-color: #e94560;
-        }
-        .btn-op:hover {
-            background-color: #ff6b81;
-        }
-        .btn-igual {
-            background-color: #0f3460;
-        }
-        .btn-igual:hover {
-            background-color: #1a5276;
-        }
-        .btn-clear {
-            background-color: #2d4059;
-        }
-        .btn-clear:hover {
-            background-color: #3d566e;
-        }
-        #info {
-            margin-top: 20px;
-            font-size: 1rem;
-            color: #e0aaff;
-            text-align: center;
-        }
+        button:hover { background-color: #7b52ab; }
+        .btn-op { background-color: #e94560; }
+        .btn-op:hover { background-color: #ff6b81; }
+        .btn-igual { background-color: #0f3460; }
+        .btn-igual:hover { background-color: #1a5276; }
+        .btn-clear { background-color: #2d4059; }
+        .btn-clear:hover { background-color: #3d566e; }
+        #info { margin-top: 20px; font-size: 1rem; color: #e0aaff; text-align: center; }
     </style>
 </head>
 <body>
@@ -116,14 +90,12 @@
 <h2 id="info" class="grande" title="Info sobre el número">Info sobre el número</h2>
 
 <script>
-    // Variables globales
     let primerNumero = null;
     let operador = null;
     let operacionRealizada = false;
 
     const pantalla = document.getElementById('pantalla');
 
-    // Función validar
     const validar = () => {
         const val = pantalla.value;
         const num = parseFloat(val);
@@ -134,7 +106,6 @@
         return true;
     };
 
-    // Función rellenar_info
     const rellenar_info = () => {
         const val = parseFloat(pantalla.value);
         const info = document.getElementById('info');
@@ -149,7 +120,6 @@
         }
     };
 
-    // Operaciones unitarias
     const sq = () => {
         if (!validar()) return;
         const val = parseFloat(pantalla.value);
@@ -167,79 +137,60 @@
     const fact = () => {
         if (!validar()) return;
         const val = parseInt(pantalla.value);
-        if (val < 0 || !Number.isInteger(val)) {
+        if (val < 0 || !Number.isInteger(parseFloat(pantalla.value))) {
             pantalla.value = 'Error';
             return;
         }
         let resultado = 1;
-        for (let i = 2; i <= val; i++) {
-            resultado *= i;
-        }
+        for (let i = 2; i <= val; i++) { resultado *= i; }
         pantalla.value = resultado;
         rellenar_info();
     };
 
-    // Operaciones binarias
-    const vaciar = () => {
-        pantalla.value = '';
+    const vaciar = () => { pantalla.value = ''; };
+
+    const calcularIntermedio = (valorActual) => {
+        if (primerNumero === null || operador === null) return valorActual;
+        switch (operador) {
+            case 'suma': return primerNumero + valorActual;
+            case 'resta': return primerNumero - valorActual;
+            case 'multiplicacion': return primerNumero * valorActual;
+            case 'division': return valorActual === 0 ? null : primerNumero / valorActual;
+        }
     };
 
-    const add = () => {
+    const operar = (nuevoOperador) => {
         if (!validar()) return;
-        primerNumero = parseFloat(pantalla.value);
-        operador = 'suma';
+        const valorActual = parseFloat(pantalla.value);
+        if (primerNumero !== null && !operacionRealizada) {
+            const resultado = calcularIntermedio(valorActual);
+            primerNumero = resultado;
+        } else {
+            primerNumero = valorActual;
+        }
+        operador = nuevoOperador;
         operacionRealizada = false;
         vaciar();
     };
 
-    const sub = () => {
-        if (!validar()) return;
-        primerNumero = parseFloat(pantalla.value);
-        operador = 'resta';
-        operacionRealizada = false;
-        vaciar();
-    };
-
-    const mul = () => {
-        if (!validar()) return;
-        primerNumero = parseFloat(pantalla.value);
-        operador = 'multiplicacion';
-        operacionRealizada = false;
-        vaciar();
-    };
-
-    const div = () => {
-        if (!validar()) return;
-        primerNumero = parseFloat(pantalla.value);
-        operador = 'division';
-        operacionRealizada = false;
-        vaciar();
-    };
+    const add = () => { operar('suma'); };
+    const sub = () => { operar('resta'); };
+    const mul = () => { operar('multiplicacion'); };
+    const div = () => { operar('division'); };
 
     const eq = () => {
         if (operacionRealizada || primerNumero === null || operador === null) return;
         if (!validar()) return;
         const segundoNumero = parseFloat(pantalla.value);
-        let resultado;
-        switch (operador) {
-            case 'suma': resultado = primerNumero + segundoNumero; break;
-            case 'resta': resultado = primerNumero - segundoNumero; break;
-            case 'multiplicacion': resultado = primerNumero * segundoNumero; break;
-            case 'division':
-                if (segundoNumero === 0) { pantalla.value = 'Error'; return; }
-                resultado = primerNumero / segundoNumero;
-                break;
-        }
+        const resultado = calcularIntermedio(segundoNumero);
+        if (resultado === null) { pantalla.value = 'Error'; return; }
         pantalla.value = resultado;
         primerNumero = resultado;
         operacionRealizada = true;
         rellenar_info();
     };
 
-    // Limpieza
-    const clearScreen = () => {
-        pantalla.value = '0';
-    };
+    const clearScreen = () => { pantalla.value = '0'; };
 
     const clearAll = () => {
         pantalla.value = '0';
@@ -248,7 +199,6 @@
         operacionRealizada = false;
     };
 
-    // Event listeners
     document.getElementById('cuadrado').addEventListener('click', sq);
     document.getElementById('raiz').addEventListener('click', sqr);
     document.getElementById('factorial').addEventListener('click', fact);
